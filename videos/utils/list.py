@@ -1,83 +1,84 @@
 from manim import *
 config.renderer = "opengl"
 
-
 class ListUtility:
     @staticmethod
     def create_1d_list(
         numbers,
-        content,
-        box_width=1,
-        box_height=1,
-        box_color=RED,
-        box_fill_opacity=0,
-
-        index_color=WHITE,
-        content_color=WHITE,
+        content=None,
+        box_width=1.0,
+        box_height=1.0,
         show_content=True,
         show_indexes=True,
-
+        box_index_spacing=0.8,
         index_overrides={},
         box_overrides={},
         content_overrides={},
     ):
-        """Creates a 1D vector (a series of boxes with numbers).
 
-        Args:
-            numbers (iterable): The numbers to display inside the boxes.
-            indexes (iterable): The indexes to display above/below the boxes(controlled outside).
-            box_width (float): The width of each box.
-            box_height (float): The height of each box.
-            box_color (Color): The color of each box.
-            fill_opacity (float): The opacity of the box fill.
-            show_content (bool): Whether to show the content inside the boxes.
-            show_indexes (bool): Whether to show the indexes above/below the boxes
-            index_color (Color): The color of the indexes.
-            content_color (Color): The color of the content.
-            index_overrides (dict): Additional arguments to pass to the Math Tex object for the indexes.
-            box_overrides (dict): Additional arguments to pass to the Rectangle object for the boxes.
-            content_overrides (dict): Additional arguments to pass to the Math Tex object for the content.
+        index_props = {
+            "color": YELLOW,
+            "font_size": 32,
+            **index_overrides
+        }
 
-        Returns:
-            VGroup: A group containing the boxes and a group containing the numbers.
-        """
+        content_props = {
+            "color": RED,
+            "font_size": 36,
+            **content_overrides
+        }
 
-        if show_content and len(numbers) != len(content):
-            raise ValueError(
-                "The length of numbers and content must be the same.")
+        box_props = {
+            "stroke_color": WHITE,
+            "stroke_width": 1,
+            "color": BLUE,
+            "fill_color": BLUE,
+            "fill_opacity": 1,
+            **box_overrides
+        }
+
+        """Creates a 1D vector (series of boxes with optional numbers and content)."""
+
+        # Content length validation
+        if show_content and content and len(numbers) != len(content):
+            raise ValueError("The length of numbers and content must match.")
 
         content_group = VGroup()
         box_group = VGroup()
         index_group = VGroup()
 
-        for i in numbers:
-            # Create a rectangle for each number
+        for i, number in enumerate(numbers):
+            # Create a rectangle (box) for each number
             box = Rectangle(
                 width=box_width,
                 height=box_height,
-                color=box_color,
-                fill_opacity=box_fill_opacity,
-                **box_overrides
+                **box_props,
             )
-
-            # Position the box horizontally
-            box.move_to([i * box_width, 0, 0])
+            box.move_to([i * box_width, 0, 0])  # Position boxes horizontally
             box_group.add(box)
 
+            # Create index numbers above the boxes
             if show_indexes:
-                # Create a MathTex object for the number
-                number_text = Text(str(i), **index_overrides)
-                number_text.set_color(index_color)
-                number_text.move_to(box.get_center())
+                number_text = Text(str(number), **index_overrides)
+                number_text.font_size = index_props["font_size"]
+                number_text.font = "Times New Roman"
+                number_text.set_color(index_props["color"])
+                number_text.next_to(box, DOWN)  # Position below box
                 index_group.add(number_text)
 
-            if show_content:
-                # Create a MathTex object for the content
-                content_text = Text(content[i], **content_overrides)
-                content_text.set_color(content_color)
+            # Add content inside the boxes (optional)
+            if show_content and content:
+                content_text = Text(str(content[i]),  **content_props)
+                content_text.font_size = content_props["font_size"]
+                content_text.set_color(content_props["color"])
                 content_text.move_to(box.get_center())
                 content_group.add(content_text)
 
+        box_group.move_to(ORIGIN)
+        content_group.move_to(ORIGIN)
+        index_group.move_to(ORIGIN + DOWN * box_index_spacing)
+
+        # Return all grouped elements
         return box_group, index_group, content_group
 
     @staticmethod

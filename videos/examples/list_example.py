@@ -1,5 +1,5 @@
-from manim import *
-from utils.list import ListUtility
+from exporter import *
+
 
 class List1D(Scene):
     def construct(self):
@@ -13,20 +13,13 @@ class List1D(Scene):
             content,
             show_content=True,
             show_indexes=True,
-            index_color=YELLOW,
-            content_color=GREEN,
-            box_overrides={
-                "stroke_width": 1,
-            },
-            index_overrides={
-                "font_size": 18,
-            }
+            box_index_spacing=1,
         )
 
         # Center the groups
-        box_group.move_to(ORIGIN)
-        content_group.move_to(ORIGIN)
-        index_group.move_to(ORIGIN + DOWN * 0.75)
+        # box_group.move_to(ORIGIN)
+        # content_group.move_to(ORIGIN)
+        # index_group.move_to(ORIGIN + DOWN * 0.75)
 
         # # merge them into a single group
         # singleton = VGroup()

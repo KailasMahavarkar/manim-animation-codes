@@ -1,5 +1,4 @@
-import importlib
-from manim import *
+from exporter import *
 
 
 class VectorArrow(Scene):
