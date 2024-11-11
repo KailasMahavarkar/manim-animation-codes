@@ -1,5 +1,4 @@
 from manim import *
-config.renderer = "opengl"
 
 class ListUtility:
     @staticmethod
@@ -83,15 +82,25 @@ class ListUtility:
 
     @staticmethod
     def create_2d_list(
+        # base props
         data,
         indexes,
+
+        # cell props
         cell_width=1,
         cell_height=1,
         cell_color=WHITE,
         cell_fill_opacity=0,
         cell_font_size=36,
+
+        # index props
+        index_font_size=24,
+
+        # control props
         show_axis=True,
         show_indexes=True,
+
+        # axis props
         x_axis_position=UP,
         y_axis_position=LEFT,
         x_axis_font_size=36,
@@ -100,30 +109,79 @@ class ListUtility:
         y_axis_label="y",
         y_axis_color=WHITE,
         x_axis_color=WHITE,
+
+        # overrides
         y_axis_overrides={},
         x_axis_overrides={},
+        index_overrides={},
+        index_text_overrides={},
+        content_text_overrides={},
+        box_overrides={},
+
+        # transformers
+        cell_transform_func=None,
+        index_cell_transform_func=None,
+        index_text_transform_func=None,
+        content_text_transform_func=None,
     ):
+
+        _content_text_overrides = {
+            "font_size": cell_font_size,
+            "color": WHITE,
+            **content_text_overrides
+        }
+
+        _index_text_overrides = {
+            "font_size": index_font_size,
+            "color": WHITE,
+            **index_text_overrides
+        }
+
         """Creates a 2D vector (a grid of boxes with row, column indices).
 
         Args:
-            data (iterable): The numbers to display inside the boxes.
-            indexes (iterable): The indexes to display above/below the boxes(controlled outside).
-            cell_width (float): The width of each box.
-            cell_height (float): The height of each box.
-            cell_color (Color): The color of each box.
-            cell_fill_opacity (float): The opacity of the box fill.
-            cell_font_size (int): The font size of the numbers inside the boxes.
-            show_axis (bool): Whether to show the axis.
-            show_indexes (bool): Whether to show the indexes above/below the boxes
-            x_axis_position (np.array): The position of the x-axis.
-            y_axis_position (np.array): The position of the y-axis.
-            x_axis_font_size (int): The font size of the x-axis label.
-            y_axis_font_size (int): The font size of the y-axis label.
-            x_axis_label (str): The label for the x-axis.
-            y_axis_label (str): The label for the y-axis.
-            y_axis_color (Color): The color of the y-axis.
-            x_axis_color (Color): The color of the x-axis.
-            y_axis_overrides (dict): Additional arguments to pass to the Math
+            # base props
+            data (List[List[Any]]): A 2D list containing the data to be displayed.
+            indexes (List[List[Any]]): A 2D list containing the row, column indices.
+
+            # cell props
+            cell_width (int, optional): The width of each cell. Defaults to 1.
+            cell_height (int, optional): The height of each cell. Defaults to 1.
+            cell_color (str, optional): The color of each cell. Defaults to WHITE.
+            cell_fill_opacity (float, optional): The fill opacity of each cell. Defaults to 0.
+            cell_font_size (int, optional): The font size of the cell content. Defaults to 36.
+
+            # index props
+            index_font_size (int, optional): The font size of the row, column indices. Defaults to 24.
+
+            # control props
+            show_axis (bool, optional): Whether to show the axis. Defaults to True.
+            show_indexes (bool, optional): Whether to show the row, column indices. Defaults to True.
+
+            # axis props
+            x_axis_position (str, optional): The position of the x-axis. Defaults to UP.
+            y_axis_position (str, optional): The position of the y-axis. Defaults to LEFT.
+            x_axis_font_size (int, optional): The font size of the x-axis label. Defaults to 36.
+            y_axis_font_size (int, optional): The font size of the y-axis label. Defaults to 36.
+            x_axis_label (str, optional): The label of the x-axis. Defaults to "x".
+            y_axis_label (str, optional): The label of the y-axis. Defaults to "y".
+            y_axis_color (str, optional): The color of the y-axis. Defaults to WHITE.
+            x_axis_color (str, optional): The color of the x-axis. Defaults to WHITE.
+
+            # overrides
+            y_axis_overrides (dict, optional): Additional properties for the y-axis. Defaults to {}.
+            x_axis_overrides (dict, optional): Additional properties for the x-axis. Defaults to {}.
+            index_overrides (dict, optional): Additional properties for the row, column indices. Defaults to {}.
+            index_text_overrides (dict, optional): Additional properties for the row, column index text. Defaults to {}.
+            content_text_overrides (dict, optional): Additional properties for the cell content text. Defaults to {}.
+            box_overrides (dict, optional): Additional properties for the cell box. Defaults to {}.
+
+            # transformers
+            cell_transform_func (function, optional): A function to transform each cell. Defaults to None.
+            index_cell_transform_func (function, optional): A function to transform each row, column index cell. Defaults to None.
+            index_text_transform_func (function, optional): A function to transform each row, column index text. Defaults to None.  
+            content_text_transform_func (function, optional): A function to transform each cell content text. Defaults to None.
+            
 
         Returns:
             VGroup: A group containing the boxes and a group containing the numbers.
@@ -148,15 +206,24 @@ class ListUtility:
                     width=cell_width,
                     height=cell_height,
                     color=cell_color,
-                    fill_opacity=cell_fill_opacity
+                    fill_opacity=cell_fill_opacity,
+                    **box_overrides
                 )
 
                 # Position each box in a grid
                 cell.move_to([j * cell_width, -i * cell_height, 0])
 
                 # Create a MathTex object for the (i, j) index
-                cell_text = Text(f"{data[i][j]}", font_size=cell_font_size)
+                cell_text = Text(
+                    f"{str(data[i][j])}",  **_content_text_overrides)
                 cell_text.move_to(cell.get_center())
+
+                if content_text_transform_func and callable(content_text_transform_func):
+                    content_text_transform_func(cell_text, i, j)
+
+                if cell_transform_func and callable(cell_transform_func):
+                    cell_transform_func(cell, i, j)
+
                 cell_group.add(cell_text)
 
                 if show_indexes:
@@ -166,13 +233,22 @@ class ListUtility:
                         height=cell_height / 4,
                         color=cell_color,
                         fill_opacity=0,
-                        stroke_width=1
+                        stroke_width=1,
+                        **index_overrides
                     )
 
                     index_rect.move_to(cell, [1, -1, 0])
-                    index_text = Text(f"{indexes[i][j]}", font_size=18)
+                    index_text = Text(
+                        f"{indexes[i][j]}",  **_index_text_overrides)
                     index_text.move_to(index_rect.get_center())
                     index_rect.add(index_text)
+
+                    if index_cell_transform_func and callable(index_cell_transform_func):
+                        index_cell_transform_func(index_rect, i, j)
+
+                    if index_text_transform_func and callable(index_text_transform_func):
+                        index_text_transform_func(index_text, i, j)
+
                     cell.add(index_rect)
 
                 grid_group.add(cell)

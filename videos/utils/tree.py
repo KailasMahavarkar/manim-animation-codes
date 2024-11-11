@@ -1,6 +1,4 @@
 from manim import *
-config.renderer = "opengl"
-
 
 class TreeUtility:
     @staticmethod

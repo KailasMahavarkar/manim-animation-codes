@@ -1,9 +1,7 @@
-# load config
+from manim import *
 from config import *
 
 from videos.utils.common import *
 from videos.utils.list import *
 from videos.utils.tree import *
-
-# load manim
-from manim import *
+from videos.utils.color import *

@@ -1,6 +1,5 @@
-from typing import Any
+from exporter import *
 from typing import Literal
-from manim import *
 
 ShapeType = Literal["ARROW_SLIM", "ARROW"]
 
@@ -35,4 +34,3 @@ def MakeShape(shape: ShapeType = "ARROW"):
         return polygon
     else:
         return None
-
