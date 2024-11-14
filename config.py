@@ -7,9 +7,9 @@ MEDIA_DIR = os.path.abspath("media")
 # config.progress_bar = "display"
 config.max_files_cached = 1000
 config.media_dir = MEDIA_DIR
-config.frame_rate = 30
+config.frame_rate = 24
 
 
 Text.set_default(
-    font="Roboto"
+    font="CMU Serif",
 )

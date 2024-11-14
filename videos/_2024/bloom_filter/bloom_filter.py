@@ -3,14 +3,77 @@ from exporter import *
 from bloom import BloomFilter
 
 
-class Video(MovingCameraScene):
+class Anima:
+    def shadow_clone_transform(self, func):
+        def wrapper(self, old_object, new_object, *args, **kwargs):
+            shadow_clone = old_object.copy()
+            self.play(ReplacementTransform(old_object, new_object), run_time=2)
+            func(self, old_object, new_object, *args, **kwargs)
+            self.play(ReplacementTransform(
+                new_object, shadow_clone), run_time=2)
+            return shadow_clone
+        return wrapper
+
+    # Static method for transformation
+    @staticmethod
+    def transform_logic(self, old_obj, new_obj):
+        self.play(ReplacementTransform(old_obj, new_obj), run_time=2)
+
+
+class Video(MovingCameraScene, Anima):
+    def shadow_clone_transform(self, old, new):
+        old_shadow_clone = old.copy()
+        new_shadow_clone = new.copy()
+        self.play(ReplacementTransform(old, new), run_time=2)
+        self.play(ReplacementTransform(new, old_shadow_clone), run_time=2)
+        return old_shadow_clone, new_shadow_clone
+
     def construct(self):
+        self.next_section("Make Bloom Filter", skip_animations=True)
+        # add border overlay
+        self.add(FullScreenRectangle(
+            stroke_width=1, fill_color=RED, fill_opacity=0))
+
         self.bloom_size = 32
         self.bloom_hash_count = 4
         self.bloom_filter = BloomFilter(
             size=self.bloom_size, hash_count=self.bloom_hash_count)
         self.bloom = VGroup()
         self.cam = self.camera.frame.animate
+
+        shuriken = Shuriken.create_shuriken(self)
+        shuriken.scale(0.35)
+        shuriken.to_corner(UR, buff=0.25)
+        shuriken.add_updater(lambda m, dt: m.rotate(-PI * dt * 1/2))
+
+        temp = VGroup(
+            Text("Bloom Filter", font_size=48, color=WHITE).scale(1.75),
+            VGroup(
+                Text(
+                    "A Bloom Filter is a probabilistic, space-efficient data structure.",
+                    t2c={"Bloom Filter": BLUE}
+                ),
+                Text("used to determine whether an element is part of a set.").set_color(
+                    WHITE)
+            ).arrange(DOWN, buff=0.25)
+        ).arrange(DOWN, buff=0.5)
+
+        temp.scale(0.7)
+
+        shuriken, temp = self.shadow_clone_transform(shuriken, temp)
+
+        self.wait(1)
+
+        self.next_section("Step 2", skip_animations=False)
+        temp = Text(
+            "Probabilistic! what's that", font_size=60, color=WHITE
+        )
+
+        shuriken, temp = self.shadow_clone_transform(shuriken, temp)    
+
+   
+
+        self.wait(1)
 
         self.next_section("Make Bloom Filter", skip_animations=True)
         for idx in range(self.bloom_size):
@@ -43,22 +106,22 @@ class Video(MovingCameraScene):
         text_bloom_filter.next_to(self.bloom, UP, buff=0.5)
 
         self.play(
-            Create(self.bloom, run_time=1.5)
-        )
-
-        self.play(
             Write(text_bloom_filter, run_time=1.5)
         )
 
         self.play(
+            FadeIn(self.bloom)
+        )
+
+        self.wait(1)
+        self.play(
             FadeOut(self.bloom),
             FadeOut(text_bloom_filter)
         )
-        self.wait(2)
+        self.wait(1)
 
         for idx, word in enumerate(["Cat", "Dog", "Python"]):
-            self.next_section(f"Word {word}", skip_animations=False)
-
+            self.bloom_filter.add(word)
             hash_list = self.bloom_filter._hashes(word)
             hash_text_group = VGroup()
             hash_value_group = VGroup()
@@ -167,12 +230,28 @@ class Video(MovingCameraScene):
             )
 
             self.wait(0.5)
-            
+
             self.play(
                 FadeIn(self.bloom),
                 FadeIn(text_bloom_filter)
             )
 
+            # updated text
+            t = Text(
+                "Words: [" +
+                ",".join([word for word in self.bloom_filter.word_list]) + "]",
+                font_size=32,
+                color=WHITE
+            )
+
+            t.move_to(text_bloom_filter.get_center())
+
+            self.play(
+                ReplacementTransform(
+                    text_bloom_filter,
+                    t,
+                )
+            )
 
             # create arrow from hash_value_group to bloom filter index
             arrow_group = VGroup()
@@ -187,28 +266,41 @@ class Video(MovingCameraScene):
 
                 old_text = self.bloom[hash_list[i]][1]
                 new_text = Text("1", font_size=32, color=RED).move_to(
-                old_text.get_center())
+                    old_text.get_center())
                 self.play(
                     Create(arrow)
                 )
-                self.play(ReplacementTransform(old_text, new_text))
 
+                self.wait(0.25)
 
-            self.bloom_filter.add(word)
+                if (old_text.get_text() == "0"):
+                    self.play(ReplacementTransform(
+                        old_text, new_text), run_time=0.2)
 
             # dade out the arrow
             self.play(
                 FadeOut(arrow_group),
-                FadeOut(hash_value_group)
+                FadeOut(hash_value_group),
+                run_time=1
             )
 
-            self.wait(1)
+            self.wait(2)
 
-            # self.play(
-            #     FadeOut(self.bloom),
-            #     FadeOut(text_bloom_filter)
-            # )
+            self.play(
+                FadeOut(self.bloom),
+                FadeOut(text_bloom_filter),
+                FadeOut(t)
+            )
 
             break
+
+        self.wait(1)
+
+        self.next_section("Check Bloom Filter", skip_animations=True)
+
+        self.play(
+            FadeIn(self.bloom),
+            FadeIn(text_bloom_filter)
+        )
 
         self.wait(3)

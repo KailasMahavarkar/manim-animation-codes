@@ -8,6 +8,7 @@ class BloomFilter:
         self.hash_count = hash_count
         self.bit_array = bitarray(size)
         self.bit_array.setall(0)
+        self.word_list = []
 
     def _hashes(self, item):
         """Generate hash_count hash values for the item."""
@@ -18,6 +19,9 @@ class BloomFilter:
         """Add an item to the Bloom filter."""
         for hash_val in self._hashes(item):
             self.bit_array[hash_val] = 1
+
+        if (item not in self.word_list):
+            self.word_list.append(item)
             
 
     def check(self, item):
