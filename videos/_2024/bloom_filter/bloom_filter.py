@@ -21,15 +21,16 @@ class Anima:
 
 
 class Video(MovingCameraScene, Anima):
-    def shadow_clone_transform(self, old, new):
+    def shadow_clone_transform(self, old, new, delay=3):
         old_shadow_clone = old.copy()
         new_shadow_clone = new.copy()
         self.play(ReplacementTransform(old, new), run_time=2)
+        self.wait(delay)
         self.play(ReplacementTransform(new, old_shadow_clone), run_time=2)
         return old_shadow_clone, new_shadow_clone
 
     def construct(self):
-        self.next_section("Make Bloom Filter", skip_animations=True)
+        self.next_section("Make Bloom Filter", skip_animations=False)
         # add border overlay
         self.add(FullScreenRectangle(
             stroke_width=1, fill_color=RED, fill_opacity=0))
@@ -50,8 +51,8 @@ class Video(MovingCameraScene, Anima):
             Text("Bloom Filter", font_size=48, color=WHITE).scale(1.75),
             VGroup(
                 Text(
-                    "A Bloom Filter is a probabilistic, space-efficient data structure.",
-                    t2c={"Bloom Filter": BLUE}
+                    "A Bloom Filter is a", "probabilistic" ", space-efficient data structure.",
+                    tex_to_color_map={"Bloom Filter": BLUE}
                 ),
                 Text("used to determine whether an element is part of a set.").set_color(
                     WHITE)
@@ -60,20 +61,11 @@ class Video(MovingCameraScene, Anima):
 
         temp.scale(0.7)
 
-        shuriken, temp = self.shadow_clone_transform(shuriken, temp)
+        shuriken, temp = self.shadow_clone_transform(shuriken, temp, 5)
 
-        self.wait(1)
 
-        self.next_section("Step 2", skip_animations=False)
-        temp = Text(
-            "Probabilistic! what's that", font_size=60, color=WHITE
-        )
 
-        shuriken, temp = self.shadow_clone_transform(shuriken, temp)    
-
-   
-
-        self.wait(1)
+        shuriken, temp = self.shadow_clone_transform(shuriken, temp, 3)
 
         self.next_section("Make Bloom Filter", skip_animations=True)
         for idx in range(self.bloom_size):
