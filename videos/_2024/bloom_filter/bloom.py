@@ -27,6 +27,10 @@ class BloomFilter:
     def check(self, item):
         """Check if an item might be in the Bloom filter."""
         return all(self.bit_array[hash_val] for hash_val in self._hashes(item))
+    
+    def clear(self):
+        self.bit_array.setall(0)
+        self.word_list = []
 
 
 # Example Usage

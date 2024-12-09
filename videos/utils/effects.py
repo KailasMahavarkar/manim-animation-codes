@@ -1,4 +1,26 @@
-from exporter import *
+from manim import *
+
+
+class Effects:
+    def shadow_clone_transform(self, old, new, delay=3, run_time=2, call=None, pre_call=None, post_call=None):
+        old_shadow_clone = old.copy()
+        if pre_call:
+            pre_call()
+        self.play(ReplacementTransform(old, new), run_time=2)
+        if call:
+            call()
+
+        self.wait(delay)
+
+        new_shadow_clone = new.copy()
+        self.play(ReplacementTransform(new, old_shadow_clone), run_time=run_time)
+        if post_call:
+            post_call()
+        return old_shadow_clone, new_shadow_clone
+    
+    def blink(self, obj, color=RED, time=0.5):
+        obj.set_color(color)
+        self.wait(time)
 
 
 class Shuriken(Scene):
