@@ -118,3 +118,5 @@ class TreePrinter:
 
         second_pass(tree, 0, "", table)
         print(table)
+
+

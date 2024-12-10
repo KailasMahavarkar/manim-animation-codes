@@ -1,7 +1,8 @@
 from typing import List
 from viz import viz, callgraph
 import json
-
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
 
 @viz
 def fibonacci(n: int) -> int:
@@ -49,18 +50,15 @@ def subset_1_recursive(nums: List[int]) -> List[List[int]]:
 
 
 
-
-
-
-
-
-
-# if __name__ == "__main__":
-#     callgraph.reset()
-#     factorial(5)
-#     call_graph_json = callgraph.get_graph_dictionary()
-#     print("\n ------ visualize callgraph ------ \n")
-#     callgraph.pretty_table()
+if __name__ == "__main__":
+    callgraph.reset()
+    # factorial(5)
+    subset_1_recursive([1, 2, 3])
+    call_graph_json = callgraph.get_graph_dictionary()
+    print("\n ------ visualize callgraph ------ \n")
+    callgraph.pretty_table()
+    callgraph.pretty()
+    # print(json.dumps(call_graph_json, indent=2))
 
 
 
