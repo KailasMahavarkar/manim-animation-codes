@@ -115,9 +115,10 @@ class CallGraphScene(MovingCameraScene):
 
     def construct(self):
         self.camera.frame.scale(1.5)
+        self.camera.frame.move_to(ORIGIN + 3*RIGHT + 3*DOWN)
 
         callgraph.reset()
-        fibonacci(4)
+        fibonacci(10, 20)
 
         call_graph_data = callgraph.get_graph_dictionary()
 

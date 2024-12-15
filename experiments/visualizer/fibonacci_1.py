@@ -42,25 +42,25 @@ def solve(nums: List[int], temp: List[int], idx: int, answer: List[List[int]]) -
     temp.pop()  # Remove the element after recursion
 
 
+@viz
+def gcd(a, b):
+    if (b == 0):
+        return a
+    return gcd(b, a % b)
+
+
 def subset_1_recursive(nums: List[int]) -> List[List[int]]:
     nums.sort()
     answer = []
     solve(nums, [], 0, answer)
 
 
-
-
-
-
-
-
-
-# if __name__ == "__main__":
-#     callgraph.reset()
-#     factorial(5)
-#     call_graph_json = callgraph.get_graph_dictionary()
-#     print("\n ------ visualize callgraph ------ \n")
-#     callgraph.pretty_table()
+if __name__ == "__main__":
+    callgraph.reset()
+    gcd(180, 24)
+    call_graph_json = callgraph.get_graph_dictionary()
+    print("\n ------ visualize callgraph ------ \n")
+    callgraph.pretty_table()
 
 
 
