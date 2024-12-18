@@ -1,5 +1,4 @@
 from functools import wraps
-from manim import *
 from time import time
 import inspect
 import copy
@@ -111,8 +110,7 @@ class callgraph(object):
                 child_node = callgraph.get_callers().get(child_id)
                 if child_node:
                     child_args = child_node.argstr()
-                    lines.append(f"  Step {counter}: Calls {
-                                 child_node.fn_name}({child_args})")
+                    lines.append(f"  Step {counter}: Calls {child_node.fn_name}({child_args})")
         return "\n".join(lines)
 
     @staticmethod
@@ -143,8 +141,7 @@ class callgraph(object):
             reset_color = "\033[0m"
             for node in tree:
                 # Print the current node with its color
-                print(f"{' ' * indent}{color}{prefix}└── {node['fn_name']}({
-                      ', '.join(map(str, node['args']))}){reset_color}")
+                print(f"{' ' * indent}{color}{prefix}└── {node['fn_name']}({', '.join(map(str, node['args']))}){reset_color}")
                 # Recurse for children
                 if 'children' in node and node['children']:
                     inner(node['children'], indent + 4, depth + 1)
@@ -212,8 +209,7 @@ class viz(object):
 
         if len(g_frames) > self.max_frames:
             raise TooManyFramesError(
-                f"Encountered more than ${
-                    self.max_frames} while executing function"
+                f"Encountered more than ${self.max_frames} while executing function"
             )
         if (time() - self.start_time) > self.max_time:
             raise TooMuchTimeError(
