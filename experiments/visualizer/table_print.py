@@ -3,13 +3,14 @@ from prettytable import PrettyTable
 
 class TreePrinter:
     @staticmethod
-    def table(tree, alignment="left"):
+    def table(tree, alignment="left", ignore_args_list=[]):
         """
         Prints the tree structure in a tabular format with dynamic column widths
         based on the maximum length of each column's data, with depth-based colors applied to the entire row.
 
         :param tree: A list containing recursion tree nodes.
         :param alignment: Alignment for arguments ('left', 'center', 'right').
+        :param ignore_args_list: A list of arguments to be ignored in the table.
         """
         # Dictionary to store maximum widths for each column
         max_lengths = {
@@ -38,8 +39,9 @@ class TreePrinter:
         def first_pass(tree, depth, prefix):
             """First pass: Calculate max widths for each column."""
             for node in tree:
-                # Update max lengths for fixed columns
-                args = node.get('args', [])
+                # Filter arguments based on ignore_args_list
+                args = [arg for i, arg in enumerate(
+                    node.get('args', [])) if i not in ignore_args_list]
                 hierarchy = f"{prefix} └── {node['fn_name']}({[*args]})"
                 max_lengths["Depth"] = max(
                     max_lengths["Depth"], len(str(depth)))
@@ -61,7 +63,9 @@ class TreePrinter:
         def second_pass(tree, depth, prefix, table):
             """Second pass: Populate the table with data."""
             for node in tree:
-                args = node.get('args', [])
+                # Filter arguments based on ignore_args_list
+                args = [arg for i, arg in enumerate(
+                    node.get('args', [])) if i not in ignore_args_list]
                 hierarchy = f"{prefix} └── {node['fn_name']}({[*args]})"
 
                 # Apply color based on depth (indexing from color_palette)
@@ -118,5 +122,3 @@ class TreePrinter:
 
         second_pass(tree, 0, "", table)
         print(table)
-
-
