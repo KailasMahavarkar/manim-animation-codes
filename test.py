@@ -1,46 +1,46 @@
+import heapq
+import heapq
+
+
 class Solution:
-    def insert(self, intervals: list[list[int]], newInterval: list[int]) -> list[list[int]]:
+    def kSmallestPairs(self, nums1, nums2, k):
         result = []
-        i, n = 0, len(intervals)
+        print(f"Initial result: {result}")
 
-        # Add all intervals that come before newInterval
-        # i = 0
-        # ci = [1, 2]
-        # ni = [3, 8]
-        # ci[1] < ni[0] => 2 < 3 -> everything is fine
-        # result = [[1, 2]]
+        if not nums1 or not nums2:
+            print("One of the input arrays is empty, returning empty result.")
+            return result
 
-        while i < n and intervals[i][1] < newInterval[0]:
-            result.append(intervals[i])
-            i += 1
+        pq = []
+        print(f"Initial priority queue (pq): {pq}")
 
-        # i = 1
-        # [3, 5] <= [4, 8]
-        # ni = min(3, 4) = 3
-        # ni = max(5, 8) = 8
+        # Push first element from nums1 and the first element from nums2 into the priority queue
+        for i in range(min(len(nums1), k)):
+            heapq.heappush(pq, (nums1[i] + nums2[0], i, 0))
+            print(f"Heap after pushing ({nums1[i] + nums2[0]}, {i}, 0): {pq}")
 
-        # i = 2
-        # [6, 7] <= [3, 8]
-        # ni = min(6, 3) = 3
-        # ni = max(7, 8) = 8
+        print("\n")
 
-        # i = 3
-        # [8, 10] <= [3, 8]
-        # ni = min(8, 3) = 3
-        # ni = max(10, 8) = 10
+        while k > 0 and pq:
+            sum_value, i, j = heapq.heappop(pq)
+            print(f"Popped from heap: sum_value={sum_value}, i={i}, j={j}")
+            result.append([nums1[i], nums2[j]])
+            print(f"Updated result: {result}")
 
-        while i < n and intervals[i][0] <= newInterval[1]:
-            newInterval[0] = min(newInterval[0], intervals[i][0])
-            newInterval[1] = max(newInterval[1], intervals[i][1])
-            i += 1
-        result.append(newInterval)
+            if j + 1 < len(nums2):
+                heapq.heappush(pq, (nums1[i] + nums2[j + 1], i, j + 1))
+                print(f"Heap after pushing ({
+                      nums1[i] + nums2[j + 1]}, {i}, {j + 1}): {pq}")
 
-        while i < n:
-            result.append(intervals[i])
-            i += 1
+            k -= 1
+            print(f"Remaining k: {k}")
+            print("\n")
+
         return result
 
 
-intervals = [[1, 2], [3, 5], [6, 7], [8, 10], [12, 16]]
-newInterval = [4, 8]
-print(Solution().insert(intervals, newInterval))
+nums1 = [1, 2, 3]
+nums2 = [4, 5]
+k = 5
+x = Solution().kSmallestPairs(nums1, nums2, k)
+print(x)
